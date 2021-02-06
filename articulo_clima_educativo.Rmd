@@ -1,0 +1,166 @@
+---
+output:
+  html_document: default
+  word_document: default
+---
+#  paquetes utilizados
+```{r}
+library(readxl)
+library(polycor)
+library(ggcorrplot)
+library(psych)
+library(corrplot)
+```
+
+
+
+# Cargando la base de datos
+```{r}
+#requiere library(readxl)
+Base<- read_excel("BASE_ARTICULO.xlsx", na = "NA")
+class(Base$E_Org1)
+```
+
+#Funcion para imputar los datos asignádole el promedio del ítem
+```{r}
+Base$E_Org1[is.na(Base$E_Org1)]<-round(mean(na.omit(Base$E_Org1)))
+Base$E_Org2[is.na(Base$E_Org2)]=round(mean(na.omit(Base$E_Org2)))
+Base$E_Org3[is.na(Base$E_Org3)]=round(mean(na.omit(Base$E_Org3)))
+Base$E_Org4[is.na(Base$E_Org4)]=round(mean(na.omit(Base$E_Org4)))
+Base$E_Org5[is.na(Base$E_Org5)]=round(mean(na.omit(Base$E_Org5)))
+Base$E_Org6[is.na(Base$E_Org6)]=round(mean(na.omit(Base$E_Org6)))
+Base$Func_7[is.na(Base$Func_7)]=round(mean(na.omit(Base$Func_7)))
+Base$Func_8[is.na(Base$Func_8)]=round(mean(na.omit(Base$Func_8)))
+Base$Func_9[is.na(Base$Func_9)]=round(mean(na.omit(Base$Func_9)))
+Base$Func_10[is.na(Base$Func_10)]=round(mean(na.omit(Base$Func_10)))
+Base$IntPE_11[is.na(Base$IntPE_11)]=round(mean(na.omit(Base$IntPE_11)))
+Base$IntPE_12[is.na(Base$IntPE_12)]=round(mean(na.omit(Base$IntPE_12)))
+Base$IntPE_12[is.na(Base$IntPE_12)]=round(mean(na.omit(Base$IntPE_12)))
+Base$IntPE_13[is.na(Base$IntPE_13)]=round(mean(na.omit(Base$IntPE_13)))
+Base$IntPE_14[is.na(Base$IntPE_14)]=round(mean(na.omit(Base$IntPE_14)))
+Base$IntPE_15[is.na(Base$IntPE_15)]=round(mean(na.omit(Base$IntPE_15)))
+Base$IntPE_16[is.na(Base$IntPE_16)]=round(mean(na.omit(Base$IntPE_16)))
+Base$IntPE_17[is.na(Base$IntPE_17)]=round(mean(na.omit(Base$IntPE_17)))
+Base$IntPE_18[is.na(Base$IntPE_18)]=round(mean(na.omit(Base$IntPE_18)))
+Base$IntPE_19[is.na(Base$IntPE_19)]=round(mean(na.omit(Base$IntPE_19)))
+Base$Met_20[is.na(Base$Met_20)]=round(mean(na.omit(Base$Met_20)))
+Base$Met_21[is.na(Base$Met_21)]=round(mean(na.omit(Base$Met_21)))
+Base$Met_22[is.na(Base$Met_22)]=round(mean(na.omit(Base$Met_22)))
+Base$Met_23[is.na(Base$Met_23)]=round(mean(na.omit(Base$Met_23)))
+Base$Met_24[is.na(Base$Met_24)]=round(mean(na.omit(Base$Met_24)))
+Base$Eval_25[is.na(Base$Eval_25)]=round(mean(na.omit(Base$Eval_25)))
+Base$Eval_26[is.na(Base$Eval_26)]=round(mean(na.omit(Base$Eval_26)))
+Base$Eval_27[is.na(Base$Eval_27)]=round(mean(na.omit(Base$Eval_27)))
+
+Base$IntP_28[is.na(Base$IntP_28)]=round(mean(na.omit(Base$IntP_28)))
+Base$IntP_29[is.na(Base$IntP_29)]=round(mean(na.omit(Base$IntP_29)))
+Base$IntP_30[is.na(Base$IntP_30)]=round(mean(na.omit(Base$IntP_30)))
+Base$IntP_31[is.na(Base$IntP_31)]=round(mean(na.omit(Base$IntP_31)))
+Base$IntP_32[is.na(Base$IntP_32)]=round(mean(na.omit(Base$IntP_32)))
+Base$IntP_33[is.na(Base$IntP_33)]=round(mean(na.omit(Base$IntP_33)))
+Base$IntExt_34[is.na(Base$IntExt_34)]=round(mean(na.omit(Base$IntExt_34)))
+Base$IntExt_35[is.na(Base$IntExt_35)]=round(mean(na.omit(Base$IntExt_35)))
+Base$IntExt_36[is.na(Base$IntExt_36)]=round(mean(na.omit(Base$IntExt_36)))
+Base$Sat_37[is.na(Base$Sat_37)]=round(mean(na.omit(Base$Sat_37)))
+Base$Sat_38[is.na(Base$Sat_38)]=round(mean(na.omit(Base$Sat_38)))
+Base$Sat_39[is.na(Base$Sat_39)]=round(mean(na.omit(Base$Sat_39)))
+Base$Sat_40[is.na(Base$Sat_40)]=round(mean(na.omit(Base$Sat_40)))
+Base$Sat_31[is.na(Base$Sat_41)]=round(mean(na.omit(Base$Sat_41)))
+
+##############################################################################################
+```
+
+#Data frame donde se encuentran unicamente las respuestas de los items del instrumento
+
+```{r}
+Items <- data.frame(Base$E_Org1,Base$E_Org2, Base$E_Org3, Base$E_Org4, Base$E_Org5, Base$E_Org6,Base$Func_7, Base$Func_8, Base$Func_9, Base$Func_10,Base$IntPE_11, Base$IntPE_12, Base$IntPE_13, Base$IntPE_14, Base$IntPE_15, Base$IntPE_16, Base$IntPE_17, Base$IntPE_18, Base$IntPE_19,Base$Met_20, Base$Met_21, Base$Met_22, Base$Met_23, Base$Met_24,Base$Eval_25, Base$Eval_26,Base$Eval_27,Base$IntP_28,Base$IntP_29, Base$IntP_30, Base$IntP_31, Base$IntP_32, Base$IntP_33,Base$IntExt_34, Base$IntExt_35, Base$IntExt_36,Base$Sat_37, Base$Sat_38, Base$Sat_39, Base$Sat_40, Base$Sat_41)
+
+#####
+colSums(is.na(Items)) #comprueba que ya no existen NA's en ninguna columna
+```
+
+## Matrices policolricas
+
+```{r}
+bfi_s <- Items # subconjunto de datos
+#requiere library(polycor)
+mat_cor <- hetcor(Items)$correlations #matriz de correlación policorica
+# requiere library(ggcorrplot)
+ggcorrplot(mat_cor,type="lower",hc.order = T)# Mapa de calor para los ítems
+```
+
+# Test de Bartlett y KMO
+```{r}
+#library(psych)
+p_esf<-cortest.bartlett(mat_cor)
+p_esf
+KMO(mat_cor)
+```
+
+# Análisis Paralelo 
+```{r}
+fa.parallel(mat_cor,n.obs=381,fa="fa",fm="minres")
+```
+
+# Análisis Factorial exploratorio
+```{r}
+modelo_oblimin<-fa(mat_cor,nfactors = 6,rotate = "oblimin",fm="minres")
+
+# Tabla de cargas factoriales
+print(modelo_oblimin$loadings,cut=0) 
+
+fa.diagram(modelo_oblimin,main = "Análisis Factorial",labels = c("1",  "2",  "3 ", "4",  "5" , "6" , "7" , "8", " 9", "10" ,"11"," 12", "13", "14", "15", "16", "17" ,"18", "19", "20", "21","22", "23" ,"24" ,"25" ,"26", "27", "28", "29", "30" ,"31", "32" ,"33" ,"34", "35", "36", "37", "38", "39" ,"40", "41"))
+modelo_oblimin$R2.scores
+```
+
+#Estadísticos de bondad de ajuste para el Análisis Factorial
+```{r}
+AFE<-fa(Items,nfactors = 6,rotate = "oblimin",fm="minres")
+
+AFE$RMSEA
+AFE$TLI
+AFE$rms
+AFE$R2
+AFE$Vaccounted
+```
+
+# Construcción de los data frame para cada factor
+
+# Escalas propuestas
+
+```{r}
+comunicacion_docente<-data.frame(Base$IntPE_17, Base$IntPE_18, Base$IntPE_19,Base$Met_20, Base$Met_21, Base$Met_22, Base$Met_23, Base$Met_24,Base$Eval_25, Base$Eval_26,Base$Eval_27)
+
+ interaccion_pares<-data.frame(Base$IntP_28,Base$IntP_29, Base$IntP_30, Base$IntP_31, Base$IntP_32, Base$IntP_33)
+ 
+  mediacion_pedagogica<-data.frame(Base$IntPE_11, Base$IntPE_12, Base$IntPE_13, Base$IntPE_14, Base$IntPE_15, Base$IntPE_16)
+  
+  estructura_organizacional<-data.frame(Base$E_Org1,Base$E_Org2, Base$E_Org3, Base$E_Org4,Base$Sat_37, Base$Sat_38, Base$Sat_39, Base$Sat_40, Base$Sat_41)
+
+  comunicacion_institucional<-data.frame(Base$E_Org5, Base$E_Org6,Base$Func_7, Base$Func_8, Base$Func_9, Base$Func_10)
+    
+  contexto_exterior<-data.frame(Base$IntExt_34, Base$IntExt_35, Base$IntExt_36)
+```
+
+#Alfa de Cronbach
+
+```{r}
+#requiere library(psych)
+f1<-alpha(comunicacion_docente)
+f2<-alpha(interaccion_pares)
+f3<-alpha(mediacion_pedagogica)
+f4<-alpha(estructura_organizacional)
+f5<-alpha(comunicacion_institucional)
+f6<-alpha(contexto_exterior)
+
+f1$total[1]
+f2$total[1]
+f3$total[1]
+f4$total[1]
+f5$total[1]
+f6$total[1]
+```
+
+
+
+
