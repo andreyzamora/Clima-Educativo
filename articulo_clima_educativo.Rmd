@@ -13,6 +13,9 @@ library(corrplot)
 ```
 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = F)
+```
 
 # Cargando la base de datos
 ```{r}
