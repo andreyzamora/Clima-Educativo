@@ -10,6 +10,9 @@ library(polycor)
 library(ggcorrplot)
 library(psych)
 library(corrplot)
+library(lavaan) #Paquete para análisis SEM
+library(semTools)# Paquete para graficar modelos SEM
+library(semPlot)
 ```
 
 
@@ -145,16 +148,16 @@ comunicacion_docente<-data.frame(Base$IntPE_17, Base$IntPE_18, Base$IntPE_19,Bas
   contexto_exterior<-data.frame(Base$IntExt_34, Base$IntExt_35, Base$IntExt_36)
 ```
 
-#Alfa de Cronbach
+# Alfa de Cronbach estructural propuesta
 
 ```{r}
 #requiere library(psych)
-f1<-alpha(comunicacion_docente)
-f2<-alpha(interaccion_pares)
-f3<-alpha(mediacion_pedagogica)
-f4<-alpha(estructura_organizacional)
-f5<-alpha(comunicacion_institucional)
-f6<-alpha(contexto_exterior)
+f1<-psych::alpha(comunicacion_docente)
+f2<-psych::alpha(interaccion_pares)
+f3<-psych::alpha(mediacion_pedagogica)
+f4<-psych::alpha(estructura_organizacional)
+f5<-psych::alpha(comunicacion_institucional)
+f6<-psych::alpha(contexto_exterior)
 
 f1$total[1]
 f2$total[1]
@@ -164,6 +167,225 @@ f5$total[1]
 f6$total[1]
 ```
 
+# Omega de McDonald estructural propuesta
+
+```{r}
+#requiere library(psych)
+f1_ome<-psych::omega(comunicacion_docente)
+f2_ome<-psych::omega(interaccion_pares)
+f3_ome<-psych::omega(mediacion_pedagogica)
+f4_ome<-psych::omega(estructura_organizacional)
+f5_ome<-psych::omega(comunicacion_institucional)
+f6_ome<-psych::omega(contexto_exterior)
+
+f1_ome$omega.tot
+f2_ome$omega.tot
+f3_ome$omega.tot
+f4_ome$omega.tot
+f5_ome$omega.tot
+f6_ome$omega.tot
+```
+
+# Análisis Confirmatorio para los modelos SEM
+
+# Estructura Original de la ECEAU
+
+
+## Estructura del archivo
+
+
+```{r}
+clima<-Items
+names(clima)<-c("I1","I2","I3","I4","I5","I6","I7","I8","I9","I10","I11","I12","I13","I14","I15","I16","I17","I18","I19","I20","I21","I22","I23","I24","I25","I26","I27","I28","I29","I30","I31","I32","I33","I34","I35","I36","I37","I38","I39","I40","I41")
+```
+
+## Modelo para la estructura original de la ECEAU
+
+
+```{r}
+modelo_teorico<-'
+Organizacional=~I1+I2+I3+I4+I5
+
+Funcionalidad=~I6+I7+I8+I9+I10
+
+I_Maestro_Alumno=~I16+I17+I18+I19+I20+I21+I22+I23+I24
+
+Metodologia=~I11+I12+I13+I14+I15
+
+Interaccion_Pares=~I28+I29+I30+I31+I32+I33
+
+Satisfaccion=~I37+I38+I39+I40+I41
+
+Evaluacion=~I25+I26+I27
+
+Contexto_Exterior=~I34+I35+I36
+
+# Variables latentes
+
+Practica_Docente =~ Evaluacion + Metodologia + I_Maestro_Alumno
+ 
+Inter_Educativa =~ Interaccion_Pares+Contexto_Exterior + Practica_Docente
+
+Institucional =~ Organizacional +Funcionalidad
+
+Clima_Educativo =~Inter_Educativa+ Institucional+Satisfaccion
+
+'
+```
+
+
+
+## Modelo SEM estructura original y sus índices de bondad de ajuste
+
+```{r}
+cfa_fit_teorico<-lavaan::sem(model=modelo_teorico,data=clima,ordered = names(data),orthogonal=FALSE,std.lv=TRUE,std.ov=TRUE,estimator="ULS")
+
+fitmeasures(cfa_fit_teorico,fit.measures="all",baseline.modle=null)
+```
+
+## Gráfica Modelo Original
+
+```{r}
+semPaths(cfa_fit_teorico, "std",residuals=F,
+         posCol=c("black", "black"),
+         edge.color="darkblue",
+         edge.label.cex=0.5,
+         layout="tree2",
+         style = "lisrel",
+         nCharNodes=25,
+         nCharEdges=25,
+         whatLbles="std",
+         rotation=4,
+        fixedStyle = c("black",1),
+       color="white",
+     nDigits=2 )
+
+```
+
+## Escalas estructura original de la ECEAU
+
+```{r}
+organizacional_ori<-data.frame(clima$I1,clima$I2,clima$I3,clima$I4,clima$I5)
+
+funcionalidad_ori<-data.frame(clima$I6,clima$I7,clima$I8,clima$I9,clima$I10)
+
+i_maestro_alumno_ori<-data.frame(clima$I16,clima$I17,clima$I18,clima$I19,clima$I20,clima$I21,clima$I22,clima$I23,clima$I24)
+
+metodologia_ori<-data.frame(clima$I11,clima$I12,clima$I13,clima$I14,clima$I15)
+
+interaccion_pares_ori<-data.frame(clima$I28,clima$I29,clima$I30,clima$I31,clima$I32,clima$I33)
+
+satisfaccion_ori<-data.frame(clima$I37,clima$I38,clima$I39,clima$I40,clima$I41)
+
+evaluacion_ori<-data.frame(clima$I25,clima$I26,clima$I27)
+
+contexto_exterior_ori<-data.frame(clima$I34,clima$I35,clima$I36)
+```
+
+## Alfa de Cronbach escalas modelo estructura original
+```{r}
+#requiere library(psych)
+f1_ori<-psych::alpha(organizacional_ori)
+f2_ori<-psych::alpha(funcionalidad_ori)
+f3_ori<-psych::alpha(i_maestro_alumno_ori)
+f4_ori<-psych::alpha(metodologia_ori)
+f5_ori<-psych::alpha(interaccion_pares_ori)
+f6_ori<-psych::alpha(satisfaccion_ori)
+f7_ori<-psych::alpha(evaluacion_ori)
+f8_ori<-psych::alpha(contexto_exterior_ori)
+
+
+f1_ori$total[1]
+f2_ori$total[1]
+f3_ori$total[1]
+f4_ori$total[1]
+f5_ori$total[1]
+f6_ori$total[1]
+f7_ori$total[1]
+f8_ori$total[1]
+```
+
+## Omega de McDonald escalas modelo estructura original
+
+
+```{r}
+#requiere library(psych)
+f1_ome_ori<-psych::omega(organizacional_ori)
+f2_ome_ori<-psych::omega(funcionalidad_ori)
+f3_ome_ori<-psych::omega(i_maestro_alumno_ori)
+f4_ome_ori<-psych::omega(metodologia_ori)
+f5_ome_ori<-psych::omega(interaccion_pares_ori)
+f6_ome_ori<-psych::omega(satisfaccion_ori)
+f7_ome_ori<-psych::omega(evaluacion_ori)
+f8_ome_ori<-psych::omega(contexto_exterior_ori)
+
+
+f1_ome_ori$omega.tot
+f2_ome_ori$omega.tot
+f3_ome_ori$omega.tot
+f4_ome_ori$omega.tot
+f5_ome_ori$omega.tot
+f6_ome_ori$omega.tot
+f7_ome_ori$omega.tot
+f8_ome_ori$omega.tot
+```
+
+
+#  Estructura Propuesta para la ECEAU
+
+
+## Modelo para la estructura propuesta para la ECEAU
+
+```{r}
+modelo_propuesto<-'
+Comunicacion_Docente=~I17+I18+I19+I20+I21+I22+I23+I24+I25
+ 
+Interaccion_Pares=~I28+I29+I30+I31+I32+I33
+  
+Mediacion_Pedagogica=~I11+I12+I13+I14+I15+I16 
+  
+Estructura_Organizacional=~I1+I2+I3+I4+I37+I38+I39+ I40+I41
+  
+Comunicacion_Institucional=~I5+I6+I7+I8+I9+I10
+  
+Contexto_Exterior=~I34+I35+I36
+
+## Var latentes
+
+INSTITUCIONAL=~Comunicacion_Institucional + Estructura_Organizacional
+
+PRACTICA_EDUCATIVA=~Comunicacion_Docente+Mediacion_Pedagogica
+
+INTERACCION_EDUCATIVA=~ Interaccion_Pares+Contexto_Exterior+PRACTICA_EDUCATIVA
+
+Clima_Educativo=~ INSTITUCIONAL+INTERACCION_EDUCATIVA
+
+'
+```
+## Modelo SEM estructura propuesta y sus índices de bondad de ajuste
+```{r}
+cfa_fit_propuesto<-lavaan::sem(model=modelo_propuesto,data=clima,ordered = names(data),orthogonal=FALSE,std.lv=TRUE,std.ov=TRUE,estimator="ULS")
+#,estimator="DWLS"
+fitmeasures(cfa_fit_propuesto,fit.measures="all",baseline.modle=null)
+```
+## Gráfica Modelo Estructura Propuesta
+
+```{r}
+semPaths(cfa_fit_propuesto, "std",residuals=F,
+         posCol=c("black", "black"),
+         edge.color="lightblue",
+         edge.label.cex=0.5,
+         layout="tree2",
+         style = "lisrel",
+         nCharNodes=20,
+         nCharEdges=20,
+        whatLbles="std",
+         rotation=4,
+        fixedStyle = c("black",1),
+       color="white",
+     nDigits=2 )
+
+```
 
 
 
